@@ -41,6 +41,7 @@ my $file_content = do { local $/; <$source_fh> };
 braces($file_content);
 despace($file_content);
 operators($file_content);
+despace($file_content);
 my @lines = split(/\r\n/, $file_content);
 indent(@lines) if $indent;
 
@@ -72,7 +73,7 @@ sub braces {
 }
 
 sub operators {
-  $_[0] =~ s/ *(\+\=|\-=|\*=|\/=|\<\=|\>\=|==|!=|<<|>>|>>>|=|\+|\-|\*|\/|<|>) */ $1 /g;
+  $_[0] =~ s/ *(\/\/|\/\*|\*\/|\+\=|\-=|\*=|\/=|\<\=|\>\=|==|!=|<<|>>|>>>|=|\+|\-|\*|\/|<|>) */ $1 /g;
                                               # put spaces around operators
 }
 
