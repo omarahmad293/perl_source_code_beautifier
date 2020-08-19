@@ -40,6 +40,7 @@ my $file_content = do { local $/; <$source_fh> };
 # Start formatting
 braces($file_content);
 despace($file_content);
+at($file_content);
 operators($file_content);
 despace($file_content);
 my @lines = split(/\r\n/, $file_content);
@@ -75,6 +76,11 @@ sub braces {
 sub operators {
   $_[0] =~ s/ *(\/\/|\/\*|\*\/|\+\=|\-=|\*=|\/=|\<\=|\>\=|==|!=|<<|>>|>>>|=|\+|\-|\*|\/|<|>) */ $1 /g;
                                               # put spaces around operators
+}
+
+sub at {
+  $_[0] =~ s/^(@[^ ]*)\r\n/\1 /gm;               # remove new line at end of lines starting with '@'
+  $_[0] =~ s/^(override[^ ]*)\r\n/\1 /gm;        # remove new line at end of lines starting with "override" (for swift)
 }
 
 sub indent {
