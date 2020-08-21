@@ -4,35 +4,42 @@ use strict;
 use Term::ANSIColor;
 use Getopt::Long qw(GetOptions);
 
+my @args = get_arguments();
+
 my $indent = 1;
 my $tab_spaces = 2;
 my $print_output = 0;
+my $inplace = 0;
 
-my $USAGE = "USAGE: $0 [input_file] [output_file] [OPTIONS]
+my $USAGE = "USAGE: $0 input_file [output_file] [OPTIONS]
 [OPTIONS]:
   --noindent: do not indent output file
   --tab-spaces=s: s is number of spaces in a tab
-  --print-output: prints the output to the terminal\n";
+  --print-output: prints the output to the terminal
+  --i: edits the file inplace\n";
+
+# Get optional parameters
+GetOptions(
+    'tab-spaces=i' => \$tab_spaces,
+    'indent!' => \$indent,
+    'print-output' => \$print_output,
+    'i|inplace' => \$inplace
+) or die(color("red"), $USAGE);
 
 # Check number of arguments
-if (scalar @ARGV < 2){
-  print("2 arguments are required\n");
+if (not((scalar @args == 2 && $inplace == 0) || (scalar @args == 1 && $inplace == 1))){
   die(color("red"), $USAGE);
 };
 
 # Get files' paths
 my ($source_path, $target_path) = @ARGV;
 
-# Get optional parameters
-GetOptions(
-    'tab-spaces=i' => \$tab_spaces,
-    'indent!' => \$indent,
-    'print-output' => \$print_output
-) or die(color("red"), $USAGE);
+if ($inplace) {
+  $target_path = $source_path;
+}
 
-# Open source and target files
+# Open source file
 open (my $source_fh, '<', $source_path) or die "Can't open file $!";
-open (my $target_fh, '>', $target_path) or die "Can't open file $!";
 
 # Read source file conent
 my $file_content = do { local $/; <$source_fh> };
@@ -45,6 +52,9 @@ operators($file_content);
 despace($file_content);
 my @lines = split(/\r\n/, $file_content);
 indent(@lines) if $indent;
+
+# Open target file
+open (my $target_fh, '>', $target_path) or die "Can't open file $!";
 
 # Write output to target file
 print $target_fh join ("\r\n", @lines);
@@ -91,4 +101,14 @@ sub indent {
     $line = (" " x $tab_spaces x $depth) . $line;
     $depth++ if ($line =~ /.*\{.*/);
   }
+}
+
+sub get_arguments() {
+  my @arguments = ();
+  foreach my $a(@ARGV) {
+    if (substr($a, 0, 2) ne "--") {
+      push(@arguments, $a);
+    }
+  }
+  return @arguments;
 }

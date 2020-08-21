@@ -11,11 +11,11 @@ This is a simple source code beautifier for java
 ## Usage
 
 ```bash
-./format.pl [input_file] [output_file] [OPTIONS]
+./format.pl input_file [output_file] [OPTIONS]
 ```
 
 ### Options
-
-* --noindent: do not indent output file (preprocessing)
-* --tab-spaces=s: s is number of spaces in a tab
-* --print-output: prints the output to the terminal
+* `--noindent`: do not indent output file (preprocessing)
+* `--tab-spaces=s`: `s` is number of spaces in a tab
+* `--print-output`: prints the output to the terminal
+* `--inplace`: edits the input file inplace
